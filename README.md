@@ -46,4 +46,19 @@ npm run dev
 - Browsers cannot play RTSP directly. The backend launches FFmpeg to transcode RTSP to HLS (m3u8 + ts) and serves it to the frontend player via hls.js.
 - HLS segments are written under `backend/streams/` and are cleaned up when you stop a stream.
 
+-To generate an RTSP link locally, you can stream a video from your pc. 
+Download and install mediamtx in addition to ffmpeg. 
+
+-Download from here -> https://github.com/bluenviron/mediamtx
+
+-Then run mediamtx by the command mediamtx or ./mediamtx
+
+-Download ffmpeg locally from here, https://www.gyan.dev/ffmpeg/builds/ 
+click the ffmpeg-git-essentials.7z      .ver .sha256 and download and extract the zip.
+
+-Then open another tab and run the ffmpeg this command in a directory where you can access the ffmpeg (make it a SYSTEM PATH you can access it from anywhere)
+
+- ffmpeg -re -stream_loop -1 -i "C:\path-to-your-video" -vf "scale=-2:720" -c:v libx264 -preset ultrafast -tune zerolatency -profile:v baseline -pix_fmt yuv420p -g 30 -keyint_min 30 -sc_threshold 0 -b:v 1500k -maxrate 2000k -bufsize 3000k -c:a aac -ar 44100 -b:a 96k -rtsp_transport tcp -f rtsp rtsp://127.0.0.1:8554/mystream
+
+Replace the path-to-our-video with actual path of the video you want to stream. 
 
