@@ -1,0 +1,21 @@
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Python
+backend/__pycache__/
+backend/venv
+backend/logs
+# Envs
+backend/.env
+frontend/.env
+
+# Streams output
+backend/streams/
+mediamtx/
+# OS
+.DS_Store
+Thumbs.db
+
+backend/ffmpeg.exe
+
