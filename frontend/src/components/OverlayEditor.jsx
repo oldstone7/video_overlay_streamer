@@ -91,7 +91,7 @@ export default function OverlayEditor({ canvas, elements, setElements }) {
                                 <div
                                     contentEditable
                                     suppressContentEditableWarning
-                                    onInput={e => updateElement(el.id, { text: e.currentTarget.textContent || '' })}
+                                    onBlur={e => updateElement(el.id, { text: e.currentTarget.textContent || '' })}
                                     style={{
                                         width: '100%',
                                         height: '100%',

@@ -2,6 +2,9 @@
 
 React + Flask + MongoDB app that plays an RTSP livestream (via HLS) with draggable/resizable overlays (text and logos). Includes a CRUD API for overlay presets and documentation.
 
+[![Watch the video](https://img.youtube.com/vi/fKxNltPqP5A/maxresdefault.jpg)](https://youtu.be/fKxNltPqP5A)
+
+
 ### Tech Stack
 - React (Vite)
 - Flask (Python)
@@ -58,7 +61,7 @@ click the ffmpeg-git-essentials.7z      .ver .sha256 and download and extract th
 
 -Then open another tab and run the ffmpeg this command in a directory where you can access the ffmpeg (make it a SYSTEM PATH you can access it from anywhere)
 
-- ffmpeg -re -stream_loop -1 -i "C:\path-to-your-video" -vf "scale=-2:720" -c:v libx264 -preset ultrafast -tune zerolatency -profile:v baseline -pix_fmt yuv420p -g 30 -keyint_min 30 -sc_threshold 0 -b:v 1500k -maxrate 2000k -bufsize 3000k -c:a aac -ar 44100 -b:a 96k -rtsp_transport tcp -f rtsp rtsp://127.0.0.1:8554/mystream
+- ffmpeg -re -stream_loop -1 -i "C:\Path-to-your-video" -vf "scale=-2:720" -c:v libx264 -preset ultrafast -tune zerolatency -profile:v baseline -pix_fmt yuv420p -g 30 -keyint_min 30 -sc_threshold 0 -b:v 1500k -maxrate 2000k -bufsize 3000k -c:a aac -ar 44100 -b:a 96k -rtsp_transport tcp -f rtsp rtsp://127.0.0.1:8554/mystream
 
 Replace the path-to-our-video with actual path of the video you want to stream. 
 
