@@ -55,7 +55,7 @@ Download and install mediamtx in addition to ffmpeg.
 
 -Download from here -> https://github.com/bluenviron/mediamtx
 
--Then run mediamtx by the command mediamtx or ./mediamtx
+-Then open a command prompt and run mediamtx by the command mediamtx or ./mediamtx (on where the mediamtx/ located)
 
 -Download ffmpeg locally from here, https://www.gyan.dev/ffmpeg/builds/ 
 click the ffmpeg-git-essentials.7z      .ver .sha256 and download and extract the zip.

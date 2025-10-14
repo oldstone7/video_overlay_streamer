@@ -106,6 +106,50 @@ export default function Player({ hlsUrl, onReady, onError }) {
         }
     }, [hlsUrl])
 
+    // If the browser somehow fullscreened the <video> (keyboard/context menu), move fullscreen to the parent container
+    useEffect(() => {
+        const video = videoRef.current
+        if (!video) return
+
+        const handler = async () => {
+            const fsEl = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement
+            if (fsEl === video) {
+                // try to switch fullscreen to the nearest .video-shell
+                const container = video.closest('.video-shell')
+                if (container) {
+                    try {
+                        // exit current fullscreen (the video) then request fullscreen on container
+                        if (document.exitFullscreen) await document.exitFullscreen()
+                        else if (document.webkitExitFullscreen) await document.webkitExitFullscreen()
+                        else if (document.mozCancelFullScreen) await document.mozCancelFullScreen()
+                        else if (document.msExitFullscreen) await document.msExitFullscreen()
+                    } catch (e) {
+                        // ignore
+                    }
+                    try {
+                        if (container.requestFullscreen) await container.requestFullscreen()
+                        else if (container.webkitRequestFullscreen) await container.webkitRequestFullscreen()
+                        else if (container.mozRequestFullScreen) await container.mozRequestFullScreen()
+                        else if (container.msRequestFullscreen) await container.msRequestFullscreen()
+                    } catch (e) {
+                        // ignore
+                    }
+                }
+            }
+        }
+
+        document.addEventListener('fullscreenchange', handler)
+        document.addEventListener('webkitfullscreenchange', handler)
+        document.addEventListener('mozfullscreenchange', handler)
+        document.addEventListener('MSFullscreenChange', handler)
+        return () => {
+            document.removeEventListener('fullscreenchange', handler)
+            document.removeEventListener('webkitfullscreenchange', handler)
+            document.removeEventListener('mozfullscreenchange', handler)
+            document.removeEventListener('MSFullscreenChange', handler)
+        }
+    }, [])
+
     useEffect(() => {
         if (videoRef.current) {
             videoRef.current.volume = volume
@@ -114,7 +158,8 @@ export default function Player({ hlsUrl, onReady, onError }) {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, height: '100%' }}>
-            <video ref={videoRef} controls autoPlay muted playsInline style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000' }} />
+            {/* Hide the browser's native fullscreen control so we can fullscreen the parent container (keeps overlays visible) */}
+            <video ref={videoRef} controlsList="nofullscreen" controls autoPlay muted playsInline style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000' }} />
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <label>Volume</label>
                 <input type="range" min={0} max={1} step={0.01} value={volume} onChange={e => setVolume(parseFloat(e.target.value))} />

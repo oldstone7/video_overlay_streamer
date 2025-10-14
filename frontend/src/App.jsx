@@ -103,6 +103,65 @@ export default function App() {
         setElements(overlay.elements)
     }
 
+    const videoShellRef = React.useRef(null)
+    const [isFullscreen, setIsFullscreen] = useState(false)
+    const [controlsVisible, setControlsVisible] = useState(false)
+    const controlsTimerRef = React.useRef(null)
+
+    useEffect(() => {
+        const handler = () => {
+            const el = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement
+            setIsFullscreen(!!el)
+        }
+        document.addEventListener('fullscreenchange', handler)
+        document.addEventListener('webkitfullscreenchange', handler)
+        document.addEventListener('mozfullscreenchange', handler)
+        document.addEventListener('MSFullscreenChange', handler)
+        return () => {
+            document.removeEventListener('fullscreenchange', handler)
+            document.removeEventListener('webkitfullscreenchange', handler)
+            document.removeEventListener('mozfullscreenchange', handler)
+            document.removeEventListener('MSFullscreenChange', handler)
+        }
+    }, [])
+
+    const toggleFullscreen = async () => {
+        try {
+            const el = videoShellRef.current
+            if (!el) return
+            if (!isFullscreen) {
+                if (el.requestFullscreen) await el.requestFullscreen()
+                else if (el.webkitRequestFullscreen) await el.webkitRequestFullscreen()
+                else if (el.mozRequestFullScreen) await el.mozRequestFullScreen()
+                else if (el.msRequestFullscreen) await el.msRequestFullscreen()
+            } else {
+                if (document.exitFullscreen) await document.exitFullscreen()
+                else if (document.webkitExitFullscreen) await document.webkitExitFullscreen()
+                else if (document.mozCancelFullScreen) await document.mozCancelFullScreen()
+                else if (document.msExitFullscreen) await document.msExitFullscreen()
+            }
+        } catch (e) {
+            console.warn('Fullscreen toggle failed', e)
+        }
+    }
+
+    // Auto-hide controls: show on mousemove/enter, hide after delay
+    const showControls = (delay = 2500) => {
+        setControlsVisible(true)
+        if (controlsTimerRef.current) {
+            clearTimeout(controlsTimerRef.current)
+        }
+        controlsTimerRef.current = setTimeout(() => setControlsVisible(false), delay)
+    }
+
+    React.useEffect(() => {
+        return () => {
+            if (controlsTimerRef.current) {
+                clearTimeout(controlsTimerRef.current)
+            }
+        }
+    }, [])
+
     return (
         <div className="container stack">
             <div className="title">Stream Overlaying</div>
@@ -153,7 +212,14 @@ export default function App() {
                 </div>
             </div>
 
-            <div className="video-shell" style={{ aspectRatio: `${canvas.width} / ${canvas.height}` }}>
+            <div
+                ref={videoShellRef}
+                className="video-shell"
+                style={{ aspectRatio: `${canvas.width} / ${canvas.height}` }}
+                onMouseMove={() => showControls()}
+                onMouseEnter={() => showControls(2500)}
+                onMouseLeave={() => setControlsVisible(false)}
+            >
                 <div style={{ position: 'absolute', inset: 0 }}>
                     <Player
                         hlsUrl={stream?.hlsUrl}
@@ -167,6 +233,29 @@ export default function App() {
                     />
                 </div>
                 <OverlayRender canvas={canvas} elements={elements} />
+
+                {/* Fullscreen toggle control (icon) - auto-hide */}
+                <div className={`video-controls ${controlsVisible ? 'visible' : ''}`} style={{ position: 'absolute', right: 12, top: 12, zIndex: 60, pointerEvents: controlsVisible ? 'auto' : 'none' }}>
+                    <button onClick={toggleFullscreen} className="button video-control-btn" aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}>
+                        {isFullscreen ? (
+                            // Exit fullscreen icon (crossed corners)
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                                <path d="M9 3H5a2 2 0 0 0-2 2v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M15 21h4a2 2 0 0 0 2-2v-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M21 9V5a2 2 0 0 0-2-2h-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M3 15v4a2 2 0 0 0 2 2h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                        ) : (
+                            // Enter fullscreen icon (corners)
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M16 3h3a2 2 0 0 1 2 2v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M21 16v3a2 2 0 0 1-2 2h-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M8 21H5a2 2 0 0 1-2-2v-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                        )}
+                    </button>
+                </div>
             </div>
 
             <div className="panel editor-shell">

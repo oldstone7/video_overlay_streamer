@@ -51,6 +51,45 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: Inter,
 
 .video-shell { position: relative; width: 100%; background: #000; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
 
+/* When the video-shell container is fullscreen, make it cover the viewport and keep overlays on top */
+.video-shell:fullscreen, .video-shell:-webkit-full-screen, .video-shell:-moz-full-screen, .video-shell:-ms-fullscreen {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 2147483647; /* very high so overlays are above other page UI */
+	border-radius: 0;
+}
+
+.video-shell:fullscreen .button, .video-shell:-webkit-full-screen .button, .video-shell:-moz-full-screen .button, .video-shell:-ms-fullscreen .button {
+	z-index: 9999;
+}
+
+.video-controls {
+	transition: opacity 220ms ease, transform 220ms ease;
+	opacity: 0;
+	transform: translateY(-6px) scale(0.98);
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+.video-controls.visible {
+	opacity: 1;
+	transform: translateY(0) scale(1);
+}
+.video-control-btn { 
+	padding: 8px; 
+	border-radius: 8px; 
+	background: rgba(0,0,0,0.45); 
+	border: 1px solid rgba(255,255,255,0.08); 
+	color: var(--text);
+	display: inline-flex; 
+	align-items: center; 
+	justify-content: center;
+}
+.video-control-btn:hover { background: rgba(255,255,255,0.03); }
+
 .editor-shell { border: 1px dashed var(--border-strong); border-radius: 12px; padding: 12px; background: rgba(255,255,255,0.02); }
 
 .toolbar { display: flex; gap: 8px; align-items: center; }

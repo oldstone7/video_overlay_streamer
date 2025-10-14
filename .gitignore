@@ -14,7 +14,7 @@ frontend/.env
 backend/streams/
 mediamtx/
 # OS
-.DS_Store
+
 Thumbs.db
 
 backend/ffmpeg.exe
